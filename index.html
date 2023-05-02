@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Ben's NHL Team Manager</title>
+	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<head>
+    <body>
+        <style>
+        body {
+			background-color: black;
+			color: white;
+			font-family: Arial, sans-serif;
+			margin: 0;
+			padding: 0;
+		}
+		h1 {
+			margin: 1rem 0;
+			text-align: center;
+		}
+		form {
+			display: flex;
+			flex-direction: column;
+			margin: 1rem;
+		}
+		form label {
+			font-size: 1.25rem;
+			margin-bottom: 0.5rem;
+		}
+		form input[type="text"],
+		form select {
+			background-color: white;
+			border: none;
+			border-radius: 0.25rem;
+			font-size: 1rem;
+			margin-bottom: 1rem;
+			padding: 0.5rem;
+			width: 100%;
+		}
+		form select option {
+			background-color: white;
+			color: black;
+		}
+		form input[type="submit"] {
+			background-color: red;
+			border: none;
+			border-radius: 0.25rem;
+			color: white;
+			cursor: pointer;
+			font-size: 1rem;
+			margin-top: 1rem;
+			padding: 0.5rem 1rem;
+			transition: all 0.2s ease-in-out;
+		}
+		form input[type="submit"]:hover {
+			background-color: darkred;
+		}
+		form input[type="submit"]:focus {
+			outline: none;
+		}
+		form input[type="submit"]:active {
+			background-color: crimson;
+		}
+		.teams-container {
+			display: flex;
+			flex-wrap: wrap;
+			 gap: 1rem;
+			justify-content: center;
+			margin: 1rem;
+		}
+		.team {
+			background-color: red;
+			border-radius: 0.25rem;
+			margin: 1rem;
+			padding: 1rem;
+			position: relative;
+			transition: all 0.2s ease-in-out;
+		}
+		.team h3 {
+			font-size: 1.5rem;
+			margin: 0;
+		}
+		.team p {
+			font-size: 1.25rem;
+			margin: 0.5rem 0 0;
+		}
+		.deleteTeam {
+			background-color: black;
+			border: none;
+			border-radius: 0.25rem;
+			color: white;
+			cursor: pointer;
+			font-size: 1rem;
+			padding: 0.5rem 1rem;
+			position: absolute;
+			right: 1rem;
+			top: 1rem;
+			transition: all 0.2s ease-in-out;
+		}
+		.deleteTeam:hover {
+			background-color: darkred;
+		}
+		.deleteTeam:focus {
+			outline: none;
+		}
+		.deleteTeam:active {
+			background-color: crimson;
+		}
+		.team.fadeOut {
+            position: absolute;
+            animation: slideOut 0.5s ease-in-out;
+            animation-fill-mode: forwards;
+            opacity: 1;
+        }
+
+        @keyframes slideOut {
+            from {
+            transform: translateX(0%);
+            opacity: 1;
+        }
+        to {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+    }
+        </style>
+
+<h1>NHL Team Manager</h1>
+<h2>Create a New Team</h2>
+<form id="createTeamForm">
+<label for="createTeamName">Name:</label>
+<input type="text" id="createTeamName" name="createTeamName" required>
+<label for="createTeamAbbreviation">Abbreviation:</label>
+<input type="text" id="createTeamAbbreviation" name="createTeamAbbreviation" maxlength="3" required>
+<label for="createTeamConference">Conference:</label>
+<select id="createTeamConference" name="createTeamConference">
+    <option value="Eastern">Eastern</option>
+    <option value="Western">Western</option>
+</select>
+<label for="createTeamDivision">Division:</label>
+<select id="createTeamDivision" name="createTeamDivision">
+    <option value="Atlantic">Atlantic</option>
+    <option value="Metropolitan">Metropolitan</option>
+    <option value="Central">Central</option>
+    <option value="Pacific">Pacific</option>
+</select>
+<input type="submit" value="Create">
+</form>
+<h2>Find a Team</h2>
+<form id="findTeamForm">
+    <label for="findTeamAbbreviation">Abbreviation:</label>
+    <input type="text" id="findTeamAbbreviation" name="findTeamAbbreviation" maxlength="3" required>
+    <input type="submit" value="Find">
+</form>
+
+<div id="teamDetails"></div>
+
+<h2>Update a Team</h2>
+<form id="updateTeamForm">
+<label for="updateTeamAbbreviation">Abbreviation:</label>
+<input type="text" id="updateTeamAbbreviation" name="updateTeamAbbreviation" maxlength="3" required>
+<label for="updateTeamName">Name:</label>
+<input type="text" id="updateTeamName" name="updateTeamName">
+<label for="updateTeamNewAbbreviation">New Abbreviation:</label>
+<input type="text" id="updateTeamNewAbbreviation" name="updateTeamNewAbbreviation" maxlength="3">
+<label for="updateTeamConference">Conference:</label>
+<select id="updateTeamConference" name="updateTeamConference">
+    <option value="Eastern">Eastern</option>
+    <option value="Western">Western</option>
+</select>
+<label for="updateTeamDivision">Division:</label>
+<select id="updateTeamDivision" name="updateTeamDivision">
+    <option value="Atlantic">Atlantic</option>
+    <option value="Metropolitan">Metropolitan</option>
+    <option value="Central">Central</option>
+    <option value="Pacific">Pacific</option>
+</select>
+<input type="submit" value="Update">
+</form>
+
+<h2>Delete a Team</h2>
+<form id="deleteTeamForm">
+<label for="deleteTeamAbbreviation">Abbreviation:</label>
+<input type="text" id="deleteTeamAbbreviation" name="deleteTeamAbbreviation" maxlength="3" required>
+<input type="submit" value="Delete">
+</form>
+
+<h2>All Teams</h2>
+<div id="teamList"></div>
+
+    <script>
+        $(document).ready(function() {
+            // Initialize array to hold NHL team objects
+            var teams = [];
+
+            // Function to create a new team object and add it to the array
+            function createTeam(name, abbreviation, conference, division) {
+                var team = {
+                    name: name,
+                    abbreviation: abbreviation,
+                    conference: conference,
+                    division: division
+                };
+                teams.push(team);
+                return team;
+            }
+
+            // Function to display all team objects in the array
+            function displayTeams() {
+                var output = "";
+                $.each(teams, function(index, team) {
+                    output += "<p><b>Name:</b> " + team.name + "<br>";
+                    output += "<b>Abbreviation:</b> " + team.abbreviation + "<br>";
+                    output += "<b>Conference:</b> " + team.conference.name + "<br>";
+                    output += "<b>Division:</b> " + team.division.name + "</p>";
+                });
+                $("#teamList").html(output);
+            }
+
+            // Function to retrieve teams from NHL Stats API and add them to the array
+            function loadTeams() {
+                $.ajax({
+                    type: "GET",
+                    url: "https://statsapi.web.nhl.com/api/v1/teams",
+                    dataType: "json",
+                    success: function(response) {
+                        $.each(response.teams, function(index, teamData) {
+                            var team = createTeam(teamData.name, teamData.abbreviation, teamData.conference, teamData.division);
+                        });
+                        displayTeams();
+                    },
+                    error: function (xhr, status, error) {
+                        alert(
+                            "Result: " +
+                            status +
+                            " " +
+                            error +
+                            " " +
+                            xhr.status +
+                            " " +
+                            xhr.statusText
+                        );
+                    },
+                });
+            }
+
+            // Function to find a team object in the array by its abbreviation
+            function findTeamByAbbreviation(abbreviation) {
+                var foundTeam = null;
+                $.each(teams, function(index, team) {
+                    if (team.abbreviation == abbreviation) {
+                        foundTeam = team;
+                        return false; 
+                }
+                });
+                return foundTeam;
+            }
+
+            // Function to display the details of a specific team object
+            function displayTeamDetails(team) {
+                var output = "<p><b>Name:</b> " + team.name + "<br>";
+                output += "<b>Abbreviation:</b> " + team.abbreviation + "<br>";
+                output += "<b>Conference:</b> " + team.conference.name + "<br>";
+                output += "<b>Division:</b> " + team.division.name + "</p>";
+                $("#teamDetails").html(output);
+            }
+
+            // Function to update the attributes of a specific team object
+            function updateTeam(team, name, abbreviation, conference, division) {
+                if (name) {
+                    team.name = name;
+                }
+                if (abbreviation) {
+                    team.abbreviation = abbreviation;
+                }
+                if (conference) {
+                    team.conference = conference;
+                }
+                if (division) {
+                    team.division = division;
+                }
+                displayTeamDetails(team);
+            }
+             
+            // Function to delete a specific team object from the array
+            function deleteTeam(team) {
+                var index = teams.indexOf(team);
+                if (index != -1) {
+                    teams.splice(index, 1);
+            }
+            displayTeams();
+            }
+
+            // Load teams from NHL Stats API on page load
+            loadTeams();
+
+            // Event listener for form submission to create a new team
+            $("#createTeamForm").submit(function(event) {
+                event.preventDefault();
+                var name = $("#createTeamName").val();
+                var abbreviation = $("#createTeamAbbreviation").val();
+                var conference = $("#createTeamConference").val();
+                var division = $("#createTeamDivision").val();
+                var team = createTeam(name, abbreviation, conference, division);
+                displayTeams();
+                $("#createTeamForm")[0].reset();
+            });
+
+            // Event listener for form submission to find a team by abbreviation
+            $("#findTeamForm").submit(function(event) {
+                event.preventDefault();
+                var abbreviation = $("#findTeamAbbreviation").val();
+                var team = findTeamByAbbreviation(abbreviation);
+                if (team) {
+                    displayTeamDetails(team);
+                } else {
+                    $("#teamDetails").html("<p>Team not found.</p>");
+                }
+                $("#findTeamForm")[0].reset();
+            });
+
+            // Event listener for form submission to update a team's attributes
+            $("#updateTeamForm").submit(function(event) {
+                event.preventDefault();
+                var abbreviation = $("#updateTeamAbbreviation").val();
+                var team = findTeamByAbbreviation(abbreviation);
+                if (team) {
+                    var name = $("#updateTeamName").val();
+                    var newAbbreviation = $("#updateTeamNewAbbreviation").val();
+                    var conference = $("#updateTeamConference").val();
+                    var division = $("#updateTeamDivision").val();
+                    updateTeam(team, name, newAbbreviation, conference, division);
+                } else {
+                    $("#teamDetails").html("<p>Team not found.</p>");
+                }
+                $("#updateTeamForm")[0].reset();
+            });
+
+            // Event listener for form submission to delete a team
+            $("#deleteTeamForm").submit(function(event) {
+                event.preventDefault();
+                var abbreviation = $("#deleteTeamAbbreviation").val();
+                var team = findTeamByAbbreviation(abbreviation);
+                if (team) {
+                    deleteTeam(team);
+                } else {
+                    $("#teamDetails").html("<p>Team not found.</p>");
+                }
+                $("#deleteTeamForm")[0].reset();
+            });
+        });
+    </script>
+
+</body>
+</html>
